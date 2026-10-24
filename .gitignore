@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Large raw dataset CSVs (keep repo lightweight; dataset is on Kaggle)
+data/*.csv
+
+# Temporary build scripts
+build_and_run_notebook.py
