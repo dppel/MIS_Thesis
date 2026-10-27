@@ -1,0 +1,37 @@
+Dataset,Model,Strategy,Base_AUC,Masked_Top3_AUC,AUC_Drop_Top3_Masking
+Credit Card Approval (Thesis),Random Forest,Baseline,0.7175,0.61,0.1075
+Credit Card Approval (Thesis),Random Forest,SMOTE,0.7175,0.6997,0.0178
+Credit Card Approval (Thesis),Random Forest,ADASYN,0.7175,0.6789,0.0386
+Credit Card Approval (Thesis),Random Forest,Cost-Sensitive,0.7175,0.61,0.1075
+Credit Card Approval (Thesis),XGBoost,Baseline,0.6707,0.5516,0.119
+Credit Card Approval (Thesis),XGBoost,SMOTE,0.6707,0.6152,0.0554
+Credit Card Approval (Thesis),XGBoost,ADASYN,0.6707,0.6659,0.0048
+Credit Card Approval (Thesis),XGBoost,Cost-Sensitive,0.6707,0.5516,0.119
+Credit Card Approval (Thesis),LightGBM,Baseline,0.6822,0.5593,0.1229
+Credit Card Approval (Thesis),LightGBM,SMOTE,0.6822,0.6689,0.0133
+Credit Card Approval (Thesis),LightGBM,ADASYN,0.6822,0.6621,0.0201
+Credit Card Approval (Thesis),LightGBM,Cost-Sensitive,0.6822,0.5593,0.1229
+Taiwan Credit Default (UCI),Random Forest,Baseline,0.7759,0.7224,0.0536
+Taiwan Credit Default (UCI),Random Forest,SMOTE,0.7759,0.7224,0.0536
+Taiwan Credit Default (UCI),Random Forest,ADASYN,0.7759,0.7224,0.0536
+Taiwan Credit Default (UCI),Random Forest,Cost-Sensitive,0.7759,0.7138,0.0621
+Taiwan Credit Default (UCI),XGBoost,Baseline,0.7757,0.7127,0.063
+Taiwan Credit Default (UCI),XGBoost,SMOTE,0.7757,0.7142,0.0616
+Taiwan Credit Default (UCI),XGBoost,ADASYN,0.7757,0.7307,0.045
+Taiwan Credit Default (UCI),XGBoost,Cost-Sensitive,0.7757,0.7011,0.0747
+Taiwan Credit Default (UCI),LightGBM,Baseline,0.7767,0.7039,0.0728
+Taiwan Credit Default (UCI),LightGBM,SMOTE,0.7767,0.7319,0.0449
+Taiwan Credit Default (UCI),LightGBM,ADASYN,0.7767,0.7329,0.0438
+Taiwan Credit Default (UCI),LightGBM,Cost-Sensitive,0.7767,0.7039,0.0728
+German Credit Risk (UCI),Random Forest,Baseline,0.7874,0.7431,0.0443
+German Credit Risk (UCI),Random Forest,SMOTE,0.7874,0.7431,0.0443
+German Credit Risk (UCI),Random Forest,ADASYN,0.7874,0.7431,0.0443
+German Credit Risk (UCI),Random Forest,Cost-Sensitive,0.7874,0.7431,0.0443
+German Credit Risk (UCI),XGBoost,Baseline,0.789,0.73,0.059
+German Credit Risk (UCI),XGBoost,SMOTE,0.789,0.7052,0.0838
+German Credit Risk (UCI),XGBoost,ADASYN,0.789,0.7052,0.0838
+German Credit Risk (UCI),XGBoost,Cost-Sensitive,0.789,0.73,0.059
+German Credit Risk (UCI),LightGBM,Baseline,0.7662,0.6363,0.1299
+German Credit Risk (UCI),LightGBM,SMOTE,0.7662,0.6363,0.1299
+German Credit Risk (UCI),LightGBM,ADASYN,0.7662,0.6363,0.1299
+German Credit Risk (UCI),LightGBM,Cost-Sensitive,0.7662,0.6363,0.1299
