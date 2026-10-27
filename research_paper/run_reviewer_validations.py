@@ -99,10 +99,7 @@ def main():
                     if strat == "SMOTE":
                         X_fit, y_fit = SMOTE(random_state=seed).fit_resample(X_tr_raw, y_train.values)
                     elif strat == "ADASYN":
-                        try:
-                            X_fit, y_fit = ADASYN(random_state=seed).fit_resample(X_tr_raw, y_train.values)
-                        except Exception:
-                            X_fit, y_fit = SMOTE(random_state=seed).fit_resample(X_tr_raw, y_train.values)
+                        X_fit, y_fit = ADASYN(random_state=seed).fit_resample(X_tr_raw, y_train.values)
                     else:
                         X_fit, y_fit = X_tr_raw, y_train.values
 

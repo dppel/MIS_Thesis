@@ -238,12 +238,8 @@ def main():
                     sampler = SMOTE(random_state=RANDOM_STATE)
                     X_tr_fit, y_tr_fit = sampler.fit_resample(X_train_trans, y_train.values)
                 elif strategy == "ADASYN":
-                    try:
-                        sampler = ADASYN(random_state=RANDOM_STATE)
-                        X_tr_fit, y_tr_fit = sampler.fit_resample(X_train_trans, y_train.values)
-                    except Exception:
-                        sampler = SMOTE(random_state=RANDOM_STATE)
-                        X_tr_fit, y_tr_fit = sampler.fit_resample(X_train_trans, y_train.values)
+                    sampler = ADASYN(random_state=RANDOM_STATE)
+                    X_tr_fit, y_tr_fit = sampler.fit_resample(X_train_trans, y_train.values)
                 else:
                     X_tr_fit, y_tr_fit = X_train_trans, y_train.values
 

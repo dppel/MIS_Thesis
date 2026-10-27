@@ -13,6 +13,8 @@ The project uses the well-known Credit Card Approval dataset (`application_recor
 - **Good standing (`1`):** Customers with statuses `C` (paid off), `X` (no loan for the month), or `0` (1–29 days past due).
 - **Delinquent / High risk (`0`):** Customers who have ever fallen 30+ days past due (`STATUS` in `1`, `2`, `3`, `4`, or `5`).
 
+*(Note on Target Coding Convention: In the original MSc thesis notebook `notebooks/Credit_Card_Approval_Prediction.ipynb`, class `1` denotes good standing and `0` denotes severe delinquency to match the thesis text. In the extended multi-dataset study under `research_paper/`, the target polarity is inverted so that `y = 1` consistently denotes the minority **Default / Severe Delinquency** class across all three benchmark datasets—Credit Card Approval, UCI Taiwan Credit Default, and Statlog German Credit—aligning predicted probabilities with standard Probability of Default $PD = P(Y=1)$ and minority default recall).*
+
 Since `credit_record.csv` has multiple monthly rows per person, I aggregated the history to **one row per customer `ID`** before merging with `application_record.csv`. This prevents the same applicant from appearing in both the training and test sets.
 
 ---
@@ -92,4 +94,5 @@ You can view and fork the notebook directly here: [kaggle.com/code/tomaspeltekis
    python research_paper/run_reviewer_validations.py
    python research_paper/run_ablation_check.py
    python research_paper/generate_figures.py
+   python research_paper/verify_manuscript_tables.py
    ```

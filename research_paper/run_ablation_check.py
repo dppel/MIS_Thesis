@@ -1,10 +1,10 @@
 """
-Independent Faithfulness / Perturbation Check (Ablation Test):
-Tests whether the Top-3 features selected by each strategy's SHAP vector
-are genuinely more informative on the real held-out test distribution.
-For each strategy (SMOTE, ADASYN, Cost-Sensitive), we mask (mean-impute) its Top-3
-SHAP features in X_test and measure the resulting drop in Baseline ROC-AUC (ΔAUC).
-A larger ΔAUC drop proves higher objective faithfulness to the underlying model & data!
+Independent Top-3 Feature-Masking Protocol (Dual Evaluation):
+Evaluates the predictive signal of the Top-3 features selected by each strategy's SHAP vector under:
+1. Self-Model Masking (ΔAUC_self): Measures the ROC-AUC drop on the strategy's OWN trained classifier
+   when its Top-3 SHAP features are masked (replaced by training mean) in X_test.
+2. Common Reference Masking (ΔAUC_ref): Measures the ROC-AUC drop on the fixed unweighted Baseline
+   evaluator when those same Top-3 features are masked in X_test.
 """
 
 import numpy as np
@@ -42,24 +42,23 @@ def main():
         col_means = np.mean(X_tr, axis=0)
 
         for m_name in models:
-            # Fit reference model on unmodified training data
+            # Fit common reference model on unmodified training data
             ref_clf = get_model(m_name, "Baseline", neg_pos)
             ref_clf.fit(X_tr, y_train.values)
-            base_auc = roc_auc_score(y_test, ref_clf.predict_proba(X_te)[:, 1])
+            ref_full_auc = roc_auc_score(y_test, ref_clf.predict_proba(X_te)[:, 1])
 
             for strat in strategies:
                 if strat == "SMOTE":
                     X_f, y_f = SMOTE(random_state=RANDOM_STATE).fit_resample(X_tr, y_train.values)
                 elif strat == "ADASYN":
-                    try:
-                        X_f, y_f = ADASYN(random_state=RANDOM_STATE).fit_resample(X_tr, y_train.values)
-                    except Exception:
-                        X_f, y_f = SMOTE(random_state=RANDOM_STATE).fit_resample(X_tr, y_train.values)
+                    X_f, y_f = ADASYN(random_state=RANDOM_STATE).fit_resample(X_tr, y_train.values)
                 else:
                     X_f, y_f = X_tr, y_train.values
 
                 clf = get_model(m_name, strat, neg_pos)
                 clf.fit(X_f, y_f)
+                self_full_auc = roc_auc_score(y_test, clf.predict_proba(X_te)[:, 1])
+
                 s_vec = extract_global_shap_vector(clf, X_shap)
                 top3_idx = np.argsort(s_vec)[::-1][:3]
 
@@ -68,21 +67,37 @@ def main():
                 for c_i in top3_idx:
                     X_te_masked[:, c_i] = col_means[c_i]
 
-                masked_auc = roc_auc_score(y_test, ref_clf.predict_proba(X_te_masked)[:, 1])
-                auc_drop = base_auc - masked_auc
+                # 1. Self-Model evaluation (drop in the strategy's own model AUC)
+                self_masked_auc = roc_auc_score(y_test, clf.predict_proba(X_te_masked)[:, 1])
+                self_auc_drop = self_full_auc - self_masked_auc
+
+                # 2. Common Reference evaluation (drop in the unweighted reference model AUC)
+                ref_masked_auc = roc_auc_score(y_test, ref_clf.predict_proba(X_te_masked)[:, 1])
+                ref_auc_drop = ref_full_auc - ref_masked_auc
+
                 rows.append({
                     "Dataset": ds_name,
                     "Model": m_name,
                     "Strategy": strat,
-                    "Base_AUC": round(base_auc, 4),
-                    "Masked_Top3_AUC": round(masked_auc, 4),
-                    "AUC_Drop_Top3_Masking": round(auc_drop, 4),
+                    "Self_Full_AUC": round(self_full_auc, 4),
+                    "Self_Masked_Top3_AUC": round(self_masked_auc, 4),
+                    "Self_AUC_Drop_Top3": round(self_auc_drop, 4),
+                    "Ref_Full_AUC": round(ref_full_auc, 4),
+                    "Ref_Masked_Top3_AUC": round(ref_masked_auc, 4),
+                    "Ref_AUC_Drop_Top3": round(ref_auc_drop, 4),
                 })
 
     df_ab = pd.DataFrame(rows)
     df_ab.to_csv("research_paper/results/shap_ablation_faithfulness.csv", index=False)
-    print("=== INDEPENDENT TOP-3 FEATURE ABLATION FAITHFULNESS (MEAN AUC DROP WHEN MASKED) ===")
-    print(df_ab.groupby("Strategy")[["Base_AUC", "Masked_Top3_AUC", "AUC_Drop_Top3_Masking"]].mean().round(4).to_string())
+    print("=== DUAL TOP-3 FEATURE MASKING EVALUATION (SELF-MODEL vs. COMMON REFERENCE) ===")
+    print(
+        df_ab.groupby("Strategy")[
+            ["Self_Full_AUC", "Self_Masked_Top3_AUC", "Self_AUC_Drop_Top3", "Ref_Full_AUC", "Ref_Masked_Top3_AUC", "Ref_AUC_Drop_Top3"]
+        ]
+        .mean()
+        .round(4)
+        .to_string()
+    )
 
 
 if __name__ == "__main__":
