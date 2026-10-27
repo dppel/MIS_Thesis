@@ -163,9 +163,33 @@ def main():
 
     adj_p_smote = holm_bonferroni(raw_p_smote)
     adj_p_adasyn = holm_bonferroni(raw_p_adasyn)
-    print("\n=== WILCOXON SIGNED-RANK TESTS WITH HOLM-BONFERRONI CORRECTION ===")
+    print("\n=== WILCOXON SIGNED-RANK TESTS WITH HOLM-BONFERRONI CORRECTION (K=12 BLOCKS, 48-RUN BENCHMARK) ===")
     for i, m in enumerate(metrics):
         print(f"{m:18s} | CS vs SMOTE: raw_p={raw_p_smote[i]:.4f}, holm_p={adj_p_smote[i]:.4f} | CS vs ADASYN: raw_p={raw_p_adasyn[i]:.4f}, holm_p={adj_p_adasyn[i]:.4f}")
+
+    # Seed-Averaged Block Wilcoxon Tests + Holm-Bonferroni on the 180-run Multi-Seed Benchmark (K=9 Ensemble Blocks)
+    ms_blocks = (
+        ms_df.groupby(["Dataset", "Model", "Strategy"])[
+            ["ROC_AUC", "PR_AUC", "Macro_F1", "Minority_Recall", "ECE_10_Raw", "ECE_10_Platt", "SHAP_Rho", "SHAP_Cos"]
+        ]
+        .mean()
+        .reset_index()
+    )
+    ms_metrics = ["ROC_AUC", "PR_AUC", "Macro_F1", "Minority_Recall", "ECE_10_Raw", "ECE_10_Platt", "SHAP_Rho", "SHAP_Cos"]
+    ms_raw_p_smote = []
+    ms_raw_p_adasyn = []
+    for m in ms_metrics:
+        cs_vals = ms_blocks[ms_blocks.Strategy == "Cost-Sensitive"][m].values
+        sm_vals = ms_blocks[ms_blocks.Strategy == "SMOTE"][m].values
+        ad_vals = ms_blocks[ms_blocks.Strategy == "ADASYN"][m].values
+        ms_raw_p_smote.append(wilcoxon(cs_vals, sm_vals).pvalue)
+        ms_raw_p_adasyn.append(wilcoxon(cs_vals, ad_vals).pvalue)
+
+    ms_adj_p_smote = holm_bonferroni(ms_raw_p_smote)
+    ms_adj_p_adasyn = holm_bonferroni(ms_raw_p_adasyn)
+    print("\n=== SEED-AVERAGED BLOCK WILCOXON TESTS (K=9 ENSEMBLE BLOCKS, 180-RUN MULTI-SEED BENCHMARK) ===")
+    for i, m in enumerate(ms_metrics):
+        print(f"{m:18s} | CS vs SMOTE: raw_p={ms_raw_p_smote[i]:.4f}, holm_p={ms_adj_p_smote[i]:.4f} | CS vs ADASYN: raw_p={ms_raw_p_adasyn[i]:.4f}, holm_p={ms_adj_p_adasyn[i]:.4f}")
 
 
 if __name__ == "__main__":
