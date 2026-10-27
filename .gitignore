@@ -15,5 +15,10 @@ venv/
 # Large raw dataset CSVs (keep repo lightweight; dataset is on Kaggle)
 data/*.csv
 
-# Temporary build scripts
+# Temporary build scripts and local unpublished manuscript files
 build_and_run_notebook.py
+research_paper/submission_package/
+research_paper/manuscript.md
+research_paper/build_submission_package.py
+research_paper/results/*.json
+

@@ -66,11 +66,12 @@ Using `shap.TreeExplainer` on the XGBoost model to inspect how applicant feature
 
 ## Project Structure
 
-- `notebooks/Credit_Card_Approval_Prediction.ipynb` — Main notebook with all outputs and plots rendered.
+- `notebooks/Credit_Card_Approval_Prediction.ipynb` — Main MSc thesis notebook with all outputs and plots rendered.
 - `credit-card-approval.ipynb` — Copy of the notebook configured for Kaggle.
-- `figures/` — Exported charts from the notebook run.
-- `results/model_comparison_results.csv` — Summary table of metrics and hyperparameters.
-- `requirements.txt` — Python packages needed to run the notebook locally.
+- `figures/` — Exported charts from the thesis notebook run.
+- `results/model_comparison_results.csv` — Summary table of thesis metrics and hyperparameters.
+- `research_paper/` — Extended multi-dataset benchmark scripts, probability calibration sensitivity analysis, and SHAP stability / feature-ablation experiments (comparing Baseline, SMOTE, ADASYN, and Cost-Sensitive Learning across Credit Card Approval, UCI Taiwan Credit Default, and Statlog German Credit).
+- `requirements.txt` — Python packages needed to run the notebook and benchmark scripts locally.
 
 ## How to Run
 
@@ -85,4 +86,10 @@ You can view and fork the notebook directly here: [kaggle.com/code/tomaspeltekis
    pip install -r requirements.txt
    ```
 2. Download `application_record.csv` and `credit_record.csv` from the [Kaggle dataset](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction) and place them in a `data/` folder.
-3. Open `notebooks/Credit_Card_Approval_Prediction.ipynb` in Jupyter or VS Code.
+3. Open `notebooks/Credit_Card_Approval_Prediction.ipynb` in Jupyter or VS Code, or run the extended research benchmark scripts:
+   ```bash
+   python research_paper/run_experiments.py
+   python research_paper/run_reviewer_validations.py
+   python research_paper/run_ablation_check.py
+   python research_paper/generate_figures.py
+   ```
