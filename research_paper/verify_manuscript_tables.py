@@ -119,15 +119,40 @@ def main():
     assert_close("Table 5 [ADASYN][Ref_AUC_Drop_Top3]", float(t5.loc["ADASYN", "Ref_AUC_Drop_Top3"]), 0.0515)
 
     print("\n===================================================================================")
-    print("4. VERIFYING TABLE 6: GRANULAR ENSEMBLE RESULTS BY DATASET")
+    print("4. VERIFYING TABLE 7 & TABLE 8: ANALYTICAL ARCHITECTURE & PAIRWISE METHOD MATRIX")
     print("===================================================================================")
-    t6_sub = df48.set_index(["Dataset", "Model", "Strategy"])
-    assert_close("Table 6 [Thesis][RF][Cost-Sensitive][ROC_AUC]", float(t6_sub.loc[("Credit Card Approval (Thesis)", "Random Forest", "Cost-Sensitive"), "ROC_AUC"]), 0.7185)
-    assert_close("Table 6 [Thesis][XGB][Cost-Sensitive][ROC_AUC]", float(t6_sub.loc[("Credit Card Approval (Thesis)", "XGBoost", "Cost-Sensitive"), "ROC_AUC"]), 0.6957)
-    assert_close("Table 6 [Taiwan][XGB][SMOTE][SHAP_Spearman_Rho]", float(t6_sub.loc[("Taiwan Credit Default (UCI)", "XGBoost", "SMOTE"), "SHAP_Spearman_Rho"]), 0.5040)
-    assert_close("Table 6 [German][RF][Cost-Sensitive][ROC_AUC]", float(t6_sub.loc[("German Credit Risk (UCI)", "Random Forest", "Cost-Sensitive"), "ROC_AUC"]), 0.7998)
+    t7 = df48.groupby(["Model", "Strategy"])[
+        ["ROC_AUC", "PR_AUC", "Macro_F1", "Minority_Recall", "ECE_Raw", "ECE_Platt", "SHAP_Spearman_Rho"]
+    ].mean().round(4)
 
-    print("\nALL 34 AUTOMATED ASSERTIONS PASSED SUCCESSFULLY [100% PASS]!")
+    assert_close("Table 7 [Decision Tree][SMOTE][SHAP_Spearman_Rho]", float(t7.loc[("Decision Tree", "SMOTE"), "SHAP_Spearman_Rho"]), 0.4208)
+    assert_close("Table 7 [Decision Tree][Cost-Sensitive][SHAP_Spearman_Rho]", float(t7.loc[("Decision Tree", "Cost-Sensitive"), "SHAP_Spearman_Rho"]), 0.6880)
+    assert_close("Table 7 [Random Forest][Cost-Sensitive][ROC_AUC]", float(t7.loc[("Random Forest", "Cost-Sensitive"), "ROC_AUC"]), 0.7649)
+    assert_close("Table 7 [Random Forest][Cost-Sensitive][SHAP_Spearman_Rho]", float(t7.loc[("Random Forest", "Cost-Sensitive"), "SHAP_Spearman_Rho"]), 0.9629)
+    assert_close("Table 7 [XGBoost][Cost-Sensitive][ROC_AUC]", float(t7.loc[("XGBoost", "Cost-Sensitive"), "ROC_AUC"]), 0.7536)
+    assert_close("Table 7 [XGBoost][Cost-Sensitive][SHAP_Spearman_Rho]", float(t7.loc[("XGBoost", "Cost-Sensitive"), "SHAP_Spearman_Rho"]), 0.9594)
+    assert_close("Table 7 [LightGBM][Cost-Sensitive][ROC_AUC]", float(t7.loc[("LightGBM", "Cost-Sensitive"), "ROC_AUC"]), 0.7451)
+    assert_close("Table 7 [LightGBM][Cost-Sensitive][SHAP_Spearman_Rho]", float(t7.loc[("LightGBM", "Cost-Sensitive"), "SHAP_Spearman_Rho"]), 0.9490)
+
+    # Pairwise Table 8 verification
+    cs_df = df48[df48["Strategy"] == "Cost-Sensitive"].sort_values(["Dataset", "Model"])
+    base_df = df48[df48["Strategy"] == "Baseline"].sort_values(["Dataset", "Model"])
+    smote_df = df48[df48["Strategy"] == "SMOTE"].sort_values(["Dataset", "Model"])
+    adasyn_df = df48[df48["Strategy"] == "ADASYN"].sort_values(["Dataset", "Model"])
+
+    assert_close("Table 8 [CS vs Baseline][Delta ROC_AUC]", float((cs_df["ROC_AUC"].values - base_df["ROC_AUC"].values).mean()), 0.0070)
+    assert_close("Table 8 [SMOTE vs ADASYN][Delta PR_AUC]", float((smote_df["PR_AUC"].values - adasyn_df["PR_AUC"].values).mean()), 0.0071)
+
+    print("\n===================================================================================")
+    print("5. VERIFYING TABLE 9: GRANULAR ENSEMBLE RESULTS BY DATASET")
+    print("===================================================================================")
+    t9_sub = df48.set_index(["Dataset", "Model", "Strategy"])
+    assert_close("Table 9 [Thesis][RF][Cost-Sensitive][ROC_AUC]", float(t9_sub.loc[("Credit Card Approval (Thesis)", "Random Forest", "Cost-Sensitive"), "ROC_AUC"]), 0.7185)
+    assert_close("Table 9 [Thesis][XGB][Cost-Sensitive][ROC_AUC]", float(t9_sub.loc[("Credit Card Approval (Thesis)", "XGBoost", "Cost-Sensitive"), "ROC_AUC"]), 0.6957)
+    assert_close("Table 9 [Taiwan][XGB][SMOTE][SHAP_Spearman_Rho]", float(t9_sub.loc[("Taiwan Credit Default (UCI)", "XGBoost", "SMOTE"), "SHAP_Spearman_Rho"]), 0.5040)
+    assert_close("Table 9 [German][RF][Cost-Sensitive][ROC_AUC]", float(t9_sub.loc[("German Credit Risk (UCI)", "Random Forest", "Cost-Sensitive"), "ROC_AUC"]), 0.7998)
+
+    print("\nALL 44 AUTOMATED ASSERTIONS PASSED SUCCESSFULLY [100% PASS]!")
 
 
 if __name__ == "__main__":

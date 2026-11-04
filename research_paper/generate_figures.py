@@ -250,6 +250,54 @@ def main():
     plt.close()
     print("Saved fig5_trilemma_tradeoff_pareto.png")
 
+    # -------------------------------------------------------------------------
+    # Figure 6: Analytical 4x4 Method x Classifier Architecture Interaction Heatmaps
+    # -------------------------------------------------------------------------
+    model_order = ["Decision Tree", "Random Forest", "XGBoost", "LightGBM"]
+    strat_order = ["Baseline", "SMOTE", "ADASYN", "Cost-Sensitive"]
+
+    fig, axes = plt.subplots(2, 2, figsize=(12.5, 8.5))
+    panel_specs = [
+        ("ROC_AUC", "A. Discriminative Ranking (ROC-AUC ↑)", "YlGnBu", ".4f", axes[0, 0]),
+        ("Minority_Recall", "B. Minority Default Recall (Sensitivity ↑)", "YlOrBr", ".4f", axes[0, 1]),
+        ("ECE_Platt", "C. Post-Hoc Platt Calibration Error (ECE_10 ↓)", "OrRd_r", ".4f", axes[1, 0]),
+        ("SHAP_Spearman_Rho", "D. SHAP Rank Stability vs. Baseline (Spearman ρ ↑)", "PuBuGn", ".4f", axes[1, 1]),
+    ]
+
+    for col, title, cmap_name, fmt_str, ax in panel_specs:
+        piv = (
+            df.groupby(["Model", "Strategy"])[col]
+            .mean()
+            .unstack("Strategy")
+            .reindex(index=model_order, columns=strat_order)
+        )
+        sns.heatmap(
+            piv,
+            annot=True,
+            fmt=fmt_str,
+            cmap=cmap_name,
+            cbar=True,
+            linewidths=1.0,
+            linecolor="white",
+            ax=ax,
+            annot_kws={"size": 10.5, "weight": "bold"},
+        )
+        ax.set_title(title, fontweight="bold", fontsize=11.5, pad=10)
+        ax.set_xlabel("Imbalance Method", fontweight="bold")
+        ax.set_ylabel("Classifier Architecture", fontweight="bold")
+        ax.tick_params(axis="y", rotation=0)
+
+    plt.suptitle(
+        "Analytical Comparison of Imbalance Methods Across Tree Classifier Architectures (48-Run Benchmark)",
+        fontweight="bold",
+        fontsize=13,
+        y=1.01,
+    )
+    plt.tight_layout()
+    plt.savefig("research_paper/figures/fig6_analytical_method_architecture_comparison.png", bbox_inches="tight")
+    plt.close()
+    print("Saved fig6_analytical_method_architecture_comparison.png")
+
     # Print Aggregated Summary Table for Manuscript
     summary = (
         df.groupby("Strategy")[
